@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSIT-1104 | Information Technology Cyber Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Outfit & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            bg: '#030712',
+                            card: 'rgba(15, 23, 42, 0.75)',
+                            border: 'rgba(56, 189, 248, 0.2)',
+                            cyan: '#00f0ff',
+                            neon: '#0066ff',
+                            purple: '#8a2be2',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #030712;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(56, 189, 248, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 240, 255, 0.6);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3), inset 0 0 12px rgba(0, 240, 255, 0.12);
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.6), 0 0 25px rgba(0, 240, 255, 0.4), 0 0 40px rgba(0, 240, 255, 0.2);
+        }
+
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        /* Rich Scroll & Entrance Animations */
+        .reveal-fade-up {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .reveal-slide-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .reveal-scale-up {
+            opacity: 0;
+            transform: scale(0.92);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .reveal-active {
+            opacity: 1 !important;
+            transform: translateY(0) translateX(0) scale(1) !important;
+        }
+
+        /* Pulsing Glow Animation */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.8)); }
+        }
+
+        .animate-pulse-glow {
+            animation: pulseGlow 4s infinite ease-in-out;
+        }
+
+        /* Floating Animation */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .animate-float {
+            animation: floatSlow 5s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030712;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-cyan-500 selection:text-black min-h-screen flex flex-col relative">
+
+    <!-- Interactive Background Cyber Canvas -->
+    <canvas id="cyberCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+    <div class="fixed inset-0 bg-grid-pattern pointer-events-none z-0"></div>
+
+    <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="h-16 flex items-center justify-between gap-4">
+                
+                <!-- Left: Logo -->
+                <a href="#home" onclick="scrollToSection(event, 'home')" class="flex items-center gap-2 group shrink-0">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-black font-extrabold shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition">
+                        <i class="fa-solid fa-code text-sm"></i>
+                    </div>
+                    <span class="text-xl font-extrabold tracking-wider text-white group-hover:text-cyan-400 transition font-mono">
+                        BSIT<span class="text-cyan-400">-1104</span>
+                    </span>
+                </a>
+
+                <!-- Right: Navigation Links + Search Bar placed on the right side next to menu -->
+                <div class="hidden lg:flex items-center gap-4">
+                    <nav class="flex items-center space-x-1 text-xs font-semibold uppercase tracking-wider">
+                        <a href="#home" onclick="scrollToSection(event, 'home')" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900/80 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-house text-[10px] text-cyan-400"></i> Home
+                        </a>
+                        <a href="#officers" onclick="scrollToSection(event, 'officers')" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900/80 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-user-shield text-[10px] text-cyan-400"></i> Officers
+                        </a>
+                        <a href="#students" onclick="scrollToSection(event, 'students')" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900/80 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-users text-[10px] text-cyan-400"></i> Student List
+                        </a>
+                        <a href="#album" onclick="scrollToSection(event, 'album')" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900/80 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-images text-[10px] text-cyan-400"></i> Album
+                        </a>
+                        <a href="#notes" onclick="scrollToSection(event, 'notes')" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900/80 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-code text-[10px] text-cyan-400"></i> Notes
+                        </a>
+                        <a href="#freedom-wall" onclick="scrollToSection(event, 'freedom-wall')" class="px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 transition flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-comment-code text-[10px]"></i> Freedom Wall
+                        </a>
+                    </nav>
+
+                    <!-- Search Bar inside top nav on right side -->
+                    <div class="relative w-48 xl:w-56 border-l border-slate-800 pl-3">
+                        <i class="fa-solid fa-terminal absolute left-6 top-1/2 -translate-y-1/2 text-cyan-500 text-xs"></i>
+                        <input type="text" id="globalNavSearch" oninput="handleGlobalSearch(this.value)" placeholder="Search directory..." 
+                               class="w-full pl-8 pr-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-cyan-300 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-lg bg-slate-900 border border-slate-800 text-cyan-400 hover:text-white">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Motivational Quotes Transition Bar -->
+        <div class="bg-slate-950/95 border-t border-slate-800/50 py-1 px-4 overflow-hidden">
+            <div class="max-w-7xl mx-auto flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                    <span class="text-cyan-400 font-bold uppercase tracking-wider">IT MOTIVATION:</span>
+                </div>
+                <div id="quoteTicker" class="text-slate-300 truncate max-w-xl transition-all duration-700 ease-in-out opacity-100 italic">
+                    "First, solve the problem. Then, write the code."
+                </div>
+                <div class="hidden sm:block text-[10px] text-slate-500">
+                    <i class="fa-solid fa-network-wired"></i> A.Y. 2026–2027
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobileMenu" class="hidden lg:hidden bg-slate-950/95 border-b border-slate-800 px-4 pt-3 pb-5 space-y-2 font-mono text-xs">
+            <div class="relative mb-3">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-cyan-500"></i>
+                <input type="text" oninput="handleGlobalSearch(this.value)" placeholder="Search database..." 
+                       class="w-full pl-8 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-lg text-white">
+            </div>
+            <a href="#home" onclick="scrollToSection(event, 'home'); toggleMobileMenu()" class="block px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-900">HOME</a>
+            <a href="#officers" onclick="scrollToSection(event, 'officers'); toggleMobileMenu()" class="block px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-900">OFFICERS</a>
+            <a href="#students" onclick="scrollToSection(event, 'students'); toggleMobileMenu()" class="block px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-900">STUDENT LIST</a>
+            <a href="#album" onclick="scrollToSection(event, 'album'); toggleMobileMenu()" class="block px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-900">ALBUM GALLERY</a>
+            <a href="#notes" onclick="scrollToSection(event, 'notes'); toggleMobileMenu()" class="block px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-900">NOTES & FILES</a>
+            <a href="#freedom-wall" onclick="scrollToSection(event, 'freedom-wall'); toggleMobileMenu()" class="block px-3 py-2 rounded-lg text-cyan-400 font-bold hover:bg-slate-900">FREEDOM WALL</a>
+        </div>
+    </header>
+
+    <section id="home" class="relative py-20 lg:py-24 overflow-hidden z-10 min-h-[82vh] flex items-center justify-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal-scale-up">
+            
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-400 text-xs font-mono mb-6 shadow-lg shadow-cyan-500/10 animate-float">
+                <i class="fa-solid fa-microchip animate-spin text-[11px]" style="animation-duration: 6s;"></i>
+                <span>BATCH 2024–2028 • A.Y. 2026–2027 • SECTION 1104</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-none mb-6">
+                DEPARTMENT OF <br>
+                <span class="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent neon-text-cyan animate-pulse-glow">
+                    INFORMATION TECHNOLOGY
+                </span>
+            </h1>
+
+            <!-- Hero Motto Box -->
+            <div class="max-w-xl mx-auto my-8 p-5 rounded-2xl glass-card border border-cyan-500/30 relative overflow-hidden group">
+                <p class="text-xs font-mono uppercase tracking-widest text-cyan-400 mb-1">Class Motto</p>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-wide italic font-mono">
+                    “Nasaan ang sabaw?”
+                </h3>
+            </div>
+
+            <p class="max-w-2xl mx-auto text-slate-400 text-sm sm:text-base leading-relaxed mb-8">
+                Welcome to the official cyber portal of <strong class="text-cyan-300">BSIT-1104</strong>. Empowering future Software Engineers, Network Administrators, and Cybersecurity Specialists.
+            </p>
+
+            <!-- Home Hero Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#students" onclick="scrollToSection(event, 'students')" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold text-sm shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105 transition transform flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i> VIEW STUDENT LIST
+                </a>
+                
+                <a href="#freedom-wall" onclick="scrollToSection(event, 'freedom-wall')" class="px-6 py-3 rounded-xl bg-slate-900 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 font-bold text-sm shadow-md transition transform hover:scale-105 flex items-center gap-2">
+                    <i class="fa-solid fa-comments text-cyan-400"></i> 💬 FREEDOM WALL
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="officers" class="py-16 relative z-10 border-t border-slate-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 reveal-fade-up">
+                <span class="text-cyan-400 text-xs font-mono uppercase tracking-widest">[ EXECUTIVE BOARD • A.Y. 2026–2027 ]</span>
+                <h2 class="text-3xl font-extrabold text-white tracking-tight mt-1">BSIT-1104 Officers</h2>
+                <p class="text-slate-400 text-xs mt-1">Class leadership and student body representatives.</p>
+            </div>
+
+            <div id="officersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal-scale-up">
+                <!-- Officers dynamically populated -->
+            </div>
+        </div>
+    </section>
+
+    <section id="students" class="py-16 relative z-10 bg-slate-950/40 border-t border-slate-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4 reveal-slide-left">
+                <div>
+                    <span class="text-cyan-400 text-xs font-mono uppercase tracking-widest">[ CLASS DIRECTORY ]</span>
+                    <h2 class="text-3xl font-extrabold text-white tracking-tight">Student List</h2>
+                    <p class="text-slate-400 text-xs mt-1">Total Enrolled Class Members: <span id="studentCount" class="text-cyan-400 font-mono font-bold">37</span></p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                    <button onclick="openAddProfileModal()" class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold rounded-xl text-xs font-mono shadow-md hover:scale-105 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-plus"></i> ADD NEW MEMBER
+                    </button>
+
+                    <div class="relative flex-1 sm:w-60">
+                        <i class="fa-solid fa-filter absolute left-3 top-1/2 -translate-y-1/2 text-cyan-500 text-xs"></i>
+                        <input type="text" id="rosterSearch" oninput="filterRoster(this.value)" placeholder="Filter students..." 
+                               class="w-full pl-8 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-500 font-mono">
+                    </div>
+                </div>
+            </div>
+
+            <div id="studentGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 reveal-fade-up">
+                <!-- Students dynamically rendered -->
+            </div>
+        </div>
+    </section>
+
+    <section id="album" class="py-16 relative z-10 border-t border-slate-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4 reveal-slide-left">
+                <div>
+                    <span class="text-cyan-400 text-xs font-mono uppercase tracking-widest">[ MEMORIES & GALLERY ]</span>
+                    <h2 class="text-3xl font-extrabold text-white tracking-tight">BSIT-1104 Album</h2>
+                    <p class="text-slate-400 text-xs mt-1">Captured photos and class milestones.</p>
+                </div>
+                <button onclick="openUploadPhotoModal()" class="px-4 py-2 bg-slate-900 border border-cyan-500/50 hover:bg-slate-800 text-cyan-300 font-bold rounded-xl text-xs font-mono transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-image text-cyan-400"></i> + UPLOAD PHOTO
+                </button>
+            </div>
+
+            <div id="albumGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal-scale-up">
+                <!-- Album photo cards -->
+            </div>
+        </div>
+    </section>
+
+    <section id="notes" class="py-16 relative z-10 bg-slate-950/40 border-t border-slate-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4 reveal-slide-left">
+                <div>
+                    <span class="text-cyan-400 text-xs font-mono uppercase tracking-widest">[ STUDY MATERIALS ]</span>
+                    <h2 class="text-3xl font-extrabold text-white tracking-tight">Notes & Files Repository</h2>
+                    <p class="text-slate-400 text-xs mt-1">Download shared lectures, programming code, and reviewers.</p>
+                </div>
+                <button onclick="openAddNoteModal()" class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold rounded-xl text-xs font-mono shadow-md hover:scale-105 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> SHARE NOTE
+                </button>
+            </div>
+
+            <div id="notesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 reveal-fade-up">
+                <!-- Study notes dynamically rendered -->
+            </div>
+        </div>
+    </section>
+
+    <section id="freedom-wall" class="py-16 relative z-10 border-t border-slate-800/60">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10 reveal-fade-up">
+                <span class="text-cyan-400 text-xs font-mono uppercase tracking-widest">[ CLASS MESSAGES ]</span>
+                <h2 class="text-3xl font-extrabold text-white tracking-tight mt-1">BSIT-1104 Freedom Wall</h2>
+                <p class="text-slate-400 text-xs mt-1">Post announcements, thoughts, or shoutouts anonymously or with your name.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 mb-10 reveal-scale-up">
+                <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2 font-mono">
+                    <i class="fa-solid fa-pen-nib text-cyan-400"></i> POST A MESSAGE
+                </h3>
+                <form id="freedomForm" onsubmit="handlePostMessage(event)" class="space-y-4 text-xs font-mono">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-slate-400 mb-1">YOUR NAME / ALIAS</label>
+                            <input type="text" id="postAuthor" required placeholder="e.g. Juan Dela Cruz" 
+                                   class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">BADGE / ROLE (OPTIONAL)</label>
+                            <input type="text" id="postBadge" placeholder="e.g. Student, Developer, Officer" 
+                                   class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-cyan-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">MESSAGE BODY</label>
+                        <textarea id="postContent" required rows="3" placeholder="Type your message here..." 
+                                  class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-cyan-500 resize-none"></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-105 transition">
+                            <i class="fa-solid fa-paper-plane mr-1"></i> SUBMIT MESSAGE
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="freedomPostsContainer" class="space-y-4 reveal-fade-up">
+                <!-- Posts dynamic -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ADD NEW PROFILE MODAL -->
+    <div id="addProfileModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-card rounded-2xl max-w-lg w-full p-6 relative my-8 border border-slate-700 shadow-2xl font-mono text-xs">
+            <button onclick="closeAddProfileModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-user-plus text-cyan-400"></i> ADD NEW MEMBER RECORD
+            </h3>
+
+            <form onsubmit="handleAddNewProfile(event)" class="space-y-3.5">
+                <div>
+                    <label class="block text-slate-400 mb-1">RECORD TYPE</label>
+                    <select id="addType" onchange="toggleAddPositionField(this.value)" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-cyan-300 focus:outline-none focus:border-cyan-500">
+                        <option value="student">Student (Class List)</option>
+                        <option value="officer">Officer (Executive Board)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">FULL NAME *</label>
+                    <input type="text" id="addName" required placeholder="e.g. Santos, Maria Clara" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div id="addPositionGroup" class="hidden">
+                    <label class="block text-slate-400 mb-1">OFFICER POSITION / TITLE *</label>
+                    <input type="text" id="addTitle" placeholder="e.g. Assistant Secretary" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">GOAL / DREAM JOB</label>
+                    <input type="text" id="addGoal" placeholder="e.g. Software Engineer, Cybersecurity" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">PROFILE PICTURE URL / AVATAR</label>
+                    <input type="text" id="addAvatar" placeholder="Leave blank for auto-generated avatar" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">BIO / STATUS</label>
+                    <textarea id="addBio" rows="2" placeholder="Short bio..." class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500 resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">SET EDIT PASSWORD (OPTIONAL)</label>
+                    <input type="password" id="addPassword" placeholder="Set password to restrict profile editing" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div class="flex gap-2 justify-end pt-3">
+                    <button type="button" onclick="closeAddProfileModal()" class="px-4 py-2 bg-slate-900 text-slate-300 rounded-lg hover:bg-slate-800">CANCEL</button>
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold rounded-lg hover:scale-105 transition">CREATE MEMBER</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- UPLOAD PHOTO MODAL -->
+    <div id="uploadPhotoModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-2xl max-w-md w-full p-6 relative font-mono text-xs">
+            <button onclick="closeUploadPhotoModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-image text-cyan-400"></i> UPLOAD PHOTO TO ALBUM
+            </h3>
+            <form onsubmit="handleUploadPhoto(event)" class="space-y-3">
+                <div>
+                    <label class="block text-slate-400 mb-1">PHOTO TITLE *</label>
+                    <input type="text" id="photoTitle" required placeholder="e.g. IT Week Group Photo" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">IMAGE URL OR LOCAL FILE</label>
+                    <input type="text" id="photoUrl" placeholder="https://example.com/photo.jpg" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500 mb-2">
+                    <input type="file" id="photoFileInput" accept="image/*" class="text-slate-400 text-[11px]">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">CAPTION / DESCRIPTION</label>
+                    <textarea id="photoCaption" rows="2" placeholder="Brief memory details..." class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500 resize-none"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeUploadPhotoModal()" class="px-3 py-1.5 bg-slate-900 text-slate-300 rounded-lg">CANCEL</button>
+                    <button type="submit" class="px-4 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold rounded-lg">UPLOAD PHOTO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX PREVIEW MODAL -->
+    <div id="lightboxModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg hidden flex items-center justify-center p-4" onclick="closeLightbox()">
+        <div class="max-w-4xl w-full relative" onclick="event.stopPropagation()">
+            <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-white text-xl">
+                <i class="fa-solid fa-xmark"></i> Close
+            </button>
+            <img id="lightboxImg" src="" class="max-h-[80vh] w-auto mx-auto rounded-xl shadow-2xl border border-cyan-500/40">
+            <div class="mt-4 text-center">
+                <h3 id="lightboxTitle" class="text-lg font-bold text-white font-mono"></h3>
+                <p id="lightboxCaption" class="text-slate-400 text-xs font-sans mt-1"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD NOTE MODAL -->
+    <div id="addNoteModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-2xl max-w-md w-full p-6 relative font-mono text-xs">
+            <button onclick="closeAddNoteModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-file-arrow-up text-cyan-400"></i> SHARE STUDY MATERIAL
+            </h3>
+            <form onsubmit="handleSaveNote(event)" class="space-y-3">
+                <div>
+                    <label class="block text-slate-400 mb-1">TITLE *</label>
+                    <input type="text" id="noteTitle" required placeholder="e.g. Object-Oriented Programming Reviewer" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">CATEGORY</label>
+                    <select id="noteCategory" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-cyan-300 focus:outline-none focus:border-cyan-500">
+                        <option value="Programming">Programming / Java / C++</option>
+                        <option value="Networking">Networking & CISCO</option>
+                        <option value="Web Dev">Web Development</option>
+                        <option value="Database">Database Management / SQL</option>
+                        <option value="General IT">General Reviewer</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">NOTE CONTENT / TEXT</label>
+                    <textarea id="noteText" rows="4" placeholder="Paste notes or code snippet here..." class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500 font-mono text-[11px]"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeAddNoteModal()" class="px-3 py-1.5 bg-slate-900 text-slate-300 rounded-lg">CANCEL</button>
+                    <button type="submit" class="px-4 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold rounded-lg">PUBLISH MATERIAL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PROFILE VIEW & EDIT MODAL -->
+    <div id="profileModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-card rounded-2xl max-w-lg w-full p-6 relative my-8 border border-slate-700 shadow-2xl">
+            <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- View Mode -->
+            <div id="modalViewMode">
+                <div class="flex items-center gap-4 mb-6">
+                    <img id="modalAvatar" src="" alt="Avatar" class="w-16 h-16 rounded-2xl object-cover border-2 border-cyan-500/50 shadow-lg shadow-cyan-500/20">
+                    <div>
+                        <h3 id="modalName" class="text-xl font-bold text-white"></h3>
+                        <p id="modalRole" class="text-xs text-cyan-400 font-mono mt-0.5"></p>
+                    </div>
+                </div>
+
+                <div class="space-y-3 bg-slate-950/70 p-4 rounded-xl border border-slate-800/80 text-xs font-mono mb-6">
+                    <div>
+                        <span class="text-slate-500 block uppercase">Goal / Dream Job</span>
+                        <p id="modalGoal" class="text-cyan-300 font-bold mt-0.5"></p>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block uppercase">Bio / Status</span>
+                        <p id="modalBio" class="text-slate-300 mt-0.5"></p>
+                    </div>
+                </div>
+
+                <button onclick="switchModalToEdit()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-cyan-400 font-bold rounded-xl text-xs font-mono transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-pen"></i> EDIT MEMBER PROFILE
+                </button>
+            </div>
+
+            <!-- Edit Mode -->
+            <div id="modalEditMode" class="hidden font-mono text-xs">
+                <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-cyan-400"></i> EDIT MEMBER PROFILE
+                </h3>
+                <form id="editProfileForm" onsubmit="handleSaveProfile(event)" class="space-y-3.5">
+                    <div>
+                        <label class="block text-slate-400 mb-1">FULL NAME</label>
+                        <input type="text" id="editName" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 mb-1">AVATAR URL / IMAGE</label>
+                        <input type="text" id="editAvatar" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 mb-1">GOAL / DREAM JOB</label>
+                        <input type="text" id="editGoal" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 mb-1">BIO / STATUS</label>
+                        <textarea id="editBio" rows="2" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500 resize-none"></textarea>
+                    </div>
+
+                    <!-- Security Passcode Box -->
+                    <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 space-y-2">
+                        <span class="text-cyan-400 font-bold block flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved"></i> PASSWORD PROTECTION
+                        </span>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-0.5">CURRENT PASSWORD <span id="passReqNotice" class="text-slate-500"></span></label>
+                            <input type="password" id="editCurrentPass" placeholder="••••••••" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-0.5">NEW PASSWORD (OPTIONAL)</label>
+                            <input type="password" id="editNewPass" placeholder="Set new password" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                        </div>
+                    </div>
+
+                    <div id="modalAlert" class="hidden p-2.5 rounded-lg text-[11px]"></div>
+
+                    <div class="flex gap-2 justify-end pt-2">
+                        <button type="button" onclick="switchModalToView()" class="px-4 py-2 bg-slate-900 text-slate-300 rounded-lg hover:bg-slate-800">CANCEL</button>
+                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold rounded-lg hover:scale-105 transition">SAVE RECORD</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-auto bg-slate-950 border-t border-slate-800/80 py-8 text-center text-xs text-slate-500 font-mono z-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="font-bold text-slate-400">BSIT-1104 CLASS PORTAL</p>
+            <p class="mt-1 text-[11px]">Department of Information Technology • Batch 2024–2028 • A.Y. 2026–2027</p>
+        </div>
+    </footer>
+
+    <script>
+        // EXACT 37 STUDENT LIST RESTORED
+        const defaultStudentsList = [
+            "Abanto, Nicole Reese", "Adajar, Diobert Myr", "Altamirano, Jay Benedict", 
+            "Andales, Angel Grace", "Bobadilla, Jose Jr.", "Bon, Princess Dianne", 
+            "Camacho, Ace Jeffrey", "Canlas, Princess Cassandra", "Capuyan, Aldrin Christian", 
+            "Castillo, Abraham Gabriel", "Castillo, Jay Ryan", "Cendaña, Nash", 
+            "Culis, Christian Noah", "De Castro, Yuan Rainier", "Dela Cruz, Lindsay", 
+            "Evangelista, Gabriel", "Falceso, Nico", "Felicisissimo, Jeremy", 
+            "Fernandez, Zhander Ian", "Florendo, Czarina Antonette", "Flores, Clint Zyrone", 
+            "Gacias, Brylle John", "Labao, Jhay May", "Lontok, Ian Mark", 
+            "Manangkil, Mary Dane", "Masangkay, John Matthew", "Mendoza, Jose Roan", 
+            "Nunez, Adrian Luke", "Obaldo, Miguel", "Ozar, Jhon Dave", 
+            "Perez, Angelo Vianne", "Rodil, Kristoffer Ivan", "Roales, Maria Carmela", 
+            "Roxas, Wesley Angelo", "Santarin, Tiffany Mae", "Tusing, Janus Victor", 
+            "Umali, Patricia Coleen"
+        ];
+
+        // EXACT OFFICERS LIST
+        const defaultOfficersList = [
+            { name: "Mendoza, Zoe Rozen C.", title: "Class Representative" },
+            { name: "Santarin, Tiffany Mhae D.", title: "Focal Person" },
+            { name: "Florendo, Carrey Antonette M.", title: "Secretary" },
+            { name: "Perez, Angela Venice O.", title: "Treasurer" },
+            { name: "Javier, Angelus B.", title: "Auditor" },
+            { name: "Flores, Clint Zyrone A.", title: "PIO 1" },
+            { name: "Felicisissimo, Reon Jeremy M.", title: "PIO 2" }
+        ];
+
+        const getAvatar = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=030712&color=00f0ff&bold=true&length=2`;
+
+        let students = JSON.parse(localStorage.getItem('bsit1104_students')) || defaultStudentsList.map((name, i) => ({
+            id: 'std_' + (i + 1),
+            type: 'student',
+            name: name,
+            goal: 'IT Specialist',
+            bio: 'BSIT-1104 Student passionate about technology.',
+            password: '',
+            avatar: getAvatar(name)
+        }));
+
+        let officers = JSON.parse(localStorage.getItem('bsit1104_officers')) || defaultOfficersList.map((off, i) => ({
+            id: 'off_' + (i + 1),
+            type: 'officer',
+            name: off.name,
+            title: off.title,
+            goal: 'Class Officer',
+            bio: `Serving as BSIT-1104 ${off.title}.`,
+            password: '',
+            avatar: getAvatar(off.name)
+        }));
+
+        let albums = JSON.parse(localStorage.getItem('bsit1104_albums')) || [
+            { id: 1, title: "Class Orientation", caption: "BSIT-1104 opening semester assembly.", url: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop" },
+            { id: 2, title: "Cybersecurity Workshop", caption: "Hands-on network analysis lab.", url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop" }
+        ];
+
+        let notesList = JSON.parse(localStorage.getItem('bsit1104_notes')) || [
+            { id: 1, title: "Data Structures Cheatsheet", category: "Programming", content: "// Array, Linked List, Stacks, Queues, Binary Trees\nclass Node {\n  constructor(data) { this.data = data; this.next = null; }\n}" },
+            { id: 2, title: "Subnetting & IP Addressing Guide", category: "Networking", content: "CIDR /24 = 255.255.255.0 (254 Usable Hosts)\nCIDR /28 = 255.255.255.240 (14 Usable Hosts)" }
+        ];
+
+        let freedomPosts = JSON.parse(localStorage.getItem('bsit1104_posts')) || [
+            { id: 1, author: "Mendoza, Zoe Rozen C.", badge: "Class Rep", content: "Welcome to our BSIT-1104 Cyber Portal A.Y. 2026–2027! Check out the album and study materials!", timestamp: "Oct 2, 2026, 8:00 AM" }
+        ];
+
+        function saveData() {
+            localStorage.setItem('bsit1104_students', JSON.stringify(students));
+            localStorage.setItem('bsit1104_officers', JSON.stringify(officers));
+            localStorage.setItem('bsit1104_albums', JSON.stringify(albums));
+            localStorage.setItem('bsit1104_notes', JSON.stringify(notesList));
+            localStorage.setItem('bsit1104_posts', JSON.stringify(freedomPosts));
+        }
+
+        // Smooth Section Scroll
+        function scrollToSection(e, sectionId) {
+            if (e) e.preventDefault();
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Render Officers
+        function renderOfficers() {
+            const container = document.getElementById('officersContainer');
+            container.innerHTML = officers.map(o => `
+                <div onclick="openProfileModal('${o.id}')" class="glass-card rounded-2xl p-5 hover:scale-[1.02] cursor-pointer transition transform shadow-lg flex items-center gap-4 relative overflow-hidden group">
+                    <img src="${o.avatar}" alt="${o.name}" class="w-14 h-14 rounded-xl object-cover border border-cyan-500/40 shadow-md">
+                    <div class="overflow-hidden">
+                        <h4 class="font-bold text-white text-sm truncate group-hover:text-cyan-300 transition">${o.name}</h4>
+                        <p class="text-[11px] text-cyan-400 font-mono font-semibold mt-0.5">${o.title || 'Officer'}</p>
+                        <p class="text-[10px] text-slate-400 font-mono truncate mt-1"><i class="fa-solid fa-bullseye text-cyan-500"></i> ${o.goal || 'Executive'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Student Roster
+        function renderRoster(filterText = "") {
+            const grid = document.getElementById('studentGrid');
+            const filtered = students.filter(s => s.name.toLowerCase().includes(filterText.toLowerCase()));
+            document.getElementById('studentCount').innerText = students.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 font-mono text-slate-500 text-xs">No records matching "${filterText}"</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(s => `
+                <div onclick="openProfileModal('${s.id}')" class="glass-card rounded-xl p-4 hover:scale-[1.02] cursor-pointer transition transform shadow-md flex items-center gap-3.5 group">
+                    <img src="${s.avatar}" alt="${s.name}" class="w-12 h-12 rounded-xl object-cover border border-slate-700 group-hover:border-cyan-400 transition">
+                    <div class="overflow-hidden">
+                        <h4 class="font-semibold text-white text-sm truncate group-hover:text-cyan-300 transition">${s.name}</h4>
+                        <p class="text-[11px] text-slate-400 font-mono truncate mt-0.5"><i class="fa-solid fa-code text-[10px] text-cyan-400"></i> ${s.goal || 'Student'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Album
+        function renderAlbums() {
+            const grid = document.getElementById('albumGrid');
+            if (albums.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 font-mono text-slate-500 text-xs">No photos uploaded yet.</div>`;
+                return;
+            }
+
+            grid.innerHTML = albums.map(a => `
+                <div class="glass-card rounded-2xl overflow-hidden group border border-slate-800 hover:border-cyan-500/50 transition">
+                    <div class="relative h-48 overflow-hidden cursor-pointer" onclick="openLightbox('${a.url}', '${escapeHTML(a.title)}', '${escapeHTML(a.caption)}')">
+                        <img src="${a.url}" alt="${a.title}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <i class="fa-solid fa-magnifying-glass-plus text-cyan-400 text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-4 flex items-start justify-between gap-2">
+                        <div>
+                            <h4 class="font-bold text-white text-sm font-mono">${escapeHTML(a.title)}</h4>
+                            <p class="text-xs text-slate-400 mt-1">${escapeHTML(a.caption)}</p>
+                        </div>
+                        <button onclick="deletePhoto(${a.id})" class="text-slate-500 hover:text-red-400 text-xs p-1" title="Delete Photo">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Notes
+        function renderNotes() {
+            const container = document.getElementById('notesContainer');
+            if (notesList.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-10 font-mono text-slate-500 text-xs">No study materials published yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = notesList.map(n => `
+                <div class="glass-card rounded-2xl p-5 font-mono text-xs flex flex-col justify-between border border-slate-800">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] font-bold border border-cyan-500/30">${n.category}</span>
+                            <button onclick="deleteNote(${n.id})" class="text-slate-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <h4 class="font-bold text-white text-sm mb-2">${escapeHTML(n.title)}</h4>
+                        <pre class="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 text-slate-300 text-[11px] overflow-x-auto max-h-32 mb-4 font-mono leading-relaxed">${escapeHTML(n.content)}</pre>
+                    </div>
+                    <button onclick="downloadNote('${escapeHTML(n.title)}', '${encodeURIComponent(n.content)}')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-cyan-400 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-download"></i> DOWNLOAD FILE
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Render Freedom Posts
+        function renderFreedomPosts() {
+            const container = document.getElementById('freedomPostsContainer');
+            if (freedomPosts.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 glass-card rounded-2xl text-slate-500 text-xs font-mono">No messages posted yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = freedomPosts.map(p => `
+                <div class="glass-card rounded-2xl p-5 shadow-lg border border-slate-800/80">
+                    <div class="flex items-center justify-between gap-2 mb-2 font-mono">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white text-xs">${escapeHTML(p.author)}</span>
+                            ${p.badge ? `<span class="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] font-bold border border-cyan-500/30">${escapeHTML(p.badge)}</span>` : ''}
+                        </div>
+                        <span class="text-[10px] text-slate-500">${p.timestamp}</span>
+                    </div>
+                    <p class="text-slate-300 text-xs leading-relaxed font-sans">${escapeHTML(p.content)}</p>
+                </div>
+            `).join('');
+        }
+
+        // Photo Upload Modal Logic
+        function openUploadPhotoModal() { document.getElementById('uploadPhotoModal').classList.remove('hidden'); }
+        function closeUploadPhotoModal() { document.getElementById('uploadPhotoModal').classList.add('hidden'); }
+
+        function handleUploadPhoto(e) {
+            e.preventDefault();
+            const title = document.getElementById('photoTitle').value.trim();
+            const caption = document.getElementById('photoCaption').value.trim();
+            const urlInput = document.getElementById('photoUrl').value.trim();
+            const fileInput = document.getElementById('photoFileInput').files[0];
+
+            if (!title) return;
+
+            const savePhoto = (src) => {
+                albums.unshift({ id: Date.now(), title, caption, url: src });
+                saveData();
+                renderAlbums();
+                closeUploadPhotoModal();
+                e.target.reset();
+            };
+
+            if (fileInput) {
+                const reader = new FileReader();
+                reader.onload = (evt) => savePhoto(evt.target.result);
+                reader.readAsDataURL(fileInput);
+            } else if (urlInput) {
+                savePhoto(urlInput);
+            } else {
+                savePhoto("https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop");
+            }
+        }
+
+        function deletePhoto(id) {
+            albums = albums.filter(a => a.id !== id);
+            saveData();
+            renderAlbums();
+        }
+
+        function openLightbox(url, title, caption) {
+            document.getElementById('lightboxImg').src = url;
+            document.getElementById('lightboxTitle').innerText = title;
+            document.getElementById('lightboxCaption').innerText = caption;
+            document.getElementById('lightboxModal').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightboxModal').classList.add('hidden');
+        }
+
+        // Notes Modal Logic
+        function openAddNoteModal() { document.getElementById('addNoteModal').classList.remove('hidden'); }
+        function closeAddNoteModal() { document.getElementById('addNoteModal').classList.add('hidden'); }
+
+        function handleSaveNote(e) {
+            e.preventDefault();
+            const title = document.getElementById('noteTitle').value.trim();
+            const category = document.getElementById('noteCategory').value;
+            const content = document.getElementById('noteText').value.trim();
+
+            if (!title || !content) return;
+
+            notesList.unshift({ id: Date.now(), title, category, content });
+            saveData();
+            renderNotes();
+            closeAddNoteModal();
+            e.target.reset();
+        }
+
+        function deleteNote(id) {
+            notesList = notesList.filter(n => n.id !== id);
+            saveData();
+            renderNotes();
+        }
+
+        function downloadNote(title, encodedContent) {
+            const content = decodeURIComponent(encodedContent);
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title.replace(/\s+/g, '_')}_BSIT1104.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Member Profile Logic
+        function openAddProfileModal() { document.getElementById('addProfileModal').classList.remove('hidden'); }
+        function closeAddProfileModal() { document.getElementById('addProfileModal').classList.add('hidden'); }
+        function toggleAddPositionField(val) {
+            document.getElementById('addPositionGroup').classList.toggle('hidden', val !== 'officer');
+        }
+
+        function handleAddNewProfile(e) {
+            e.preventDefault();
+            const type = document.getElementById('addType').value;
+            const name = document.getElementById('addName').value.trim();
+            const title = document.getElementById('addTitle').value.trim();
+            const goal = document.getElementById('addGoal').value.trim();
+            const avatar = document.getElementById('addAvatar').value.trim();
+            const bio = document.getElementById('addBio').value.trim();
+            const password = document.getElementById('addPassword').value.trim();
+
+            if (!name) return;
+
+            const newMember = {
+                id: (type === 'officer' ? 'off_' : 'std_') + Date.now(),
+                type: type,
+                name: name,
+                title: type === 'officer' ? (title || 'Officer') : undefined,
+                goal: goal || (type === 'officer' ? 'Class Officer' : 'IT Specialist'),
+                bio: bio || 'BSIT-1104 Class Member.',
+                password: password,
+                avatar: avatar || getAvatar(name)
+            };
+
+            if (type === 'officer') {
+                officers.push(newMember);
+                renderOfficers();
+            } else {
+                students.push(newMember);
+                renderRoster();
+            }
+
+            saveData();
+            closeAddProfileModal();
+            e.target.reset();
+        }
+
+        let activeRecord = null;
+
+        function openProfileModal(id) {
+            let record = students.find(s => s.id === id) || officers.find(o => o.id === id);
+            if (!record) return;
+
+            activeRecord = record;
+            document.getElementById('modalAvatar').src = record.avatar;
+            document.getElementById('modalName').innerText = record.name;
+            document.getElementById('modalRole').innerText = record.title ? `OFFICER • ${record.title}` : "BSIT-1104 STUDENT";
+            document.getElementById('modalGoal').innerText = record.goal || "IT Specialist";
+            document.getElementById('modalBio').innerText = record.bio || "No bio provided.";
+
+            switchModalToView();
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.add('hidden');
+            activeRecord = null;
+        }
+
+        function switchModalToView() {
+            document.getElementById('modalViewMode').classList.remove('hidden');
+            document.getElementById('modalEditMode').classList.add('hidden');
+        }
+
+        function switchModalToEdit() {
+            if (!activeRecord) return;
+            document.getElementById('editName').value = activeRecord.name;
+            document.getElementById('editAvatar').value = activeRecord.avatar;
+            document.getElementById('editGoal').value = activeRecord.goal || '';
+            document.getElementById('editBio').value = activeRecord.bio || '';
+            document.getElementById('editCurrentPass').value = '';
+            document.getElementById('editNewPass').value = '';
+
+            document.getElementById('modalAlert').classList.add('hidden');
+            document.getElementById('passReqNotice').innerText = activeRecord.password ? "(Required)" : "(Leave blank if setting for first time)";
+
+            document.getElementById('modalViewMode').classList.add('hidden');
+            document.getElementById('modalEditMode').classList.remove('hidden');
+        }
+
+        function handleSaveProfile(e) {
+            e.preventDefault();
+            if (!activeRecord) return;
+
+            const currentPassInput = document.getElementById('editCurrentPass').value;
+            const newPassInput = document.getElementById('editNewPass').value.trim();
+            const alertBox = document.getElementById('modalAlert');
+
+            if (activeRecord.password && activeRecord.password !== currentPassInput) {
+                alertBox.className = "p-2.5 rounded-lg text-xs font-mono bg-red-500/20 text-red-400 border border-red-500/40";
+                alertBox.innerText = "ACCESS DENIED: Incorrect Password.";
+                alertBox.classList.remove('hidden');
+                return;
+            }
+
+            activeRecord.name = document.getElementById('editName').value.trim();
+            activeRecord.avatar = document.getElementById('editAvatar').value.trim() || getAvatar(activeRecord.name);
+            activeRecord.goal = document.getElementById('editGoal').value.trim();
+            activeRecord.bio = document.getElementById('editBio').value.trim();
+
+            if (newPassInput.length > 0) activeRecord.password = newPassInput;
+
+            saveData();
+            renderOfficers();
+            renderRoster();
+
+            alertBox.className = "p-2.5 rounded-lg text-xs font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/40";
+            alertBox.innerText = "PROFILE SAVED!";
+            alertBox.classList.remove('hidden');
+
+            setTimeout(() => { openProfileModal(activeRecord.id); }, 600);
+        }
+
+        // Post Message
+        function handlePostMessage(e) {
+            e.preventDefault();
+            const author = document.getElementById('postAuthor').value.trim();
+            const badge = document.getElementById('postBadge').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+
+            if (!author || !content) return;
+
+            freedomPosts.unshift({
+                id: Date.now(),
+                author,
+                badge: badge || "BSIT-1104",
+                content,
+                timestamp: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+            });
+
+            saveData();
+            renderFreedomPosts();
+            document.getElementById('freedomForm').reset();
+        }
+
+        function handleGlobalSearch(q) {
+            renderRoster(q);
+            if (q.trim() !== '') {
+                scrollToSection(null, 'students');
+            }
+        }
+
+        function filterRoster(q) { renderRoster(q); }
+        function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('hidden'); }
+        function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
+
+        // Quote Ticker
+        const quotes = [
+            `"First, solve the problem. Then, write the code."`,
+            `"Code is like humor. When you have to explain it, it’s bad."`,
+            `"Talk is cheap. Show me the code."`,
+            `"Simplicity is the soul of efficiency."`,
+            `"Make it work, make it right, make it fast."`
+        ];
+        let currentQuoteIndex = 0;
+
+        function startQuoteTicker() {
+            const ticker = document.getElementById('quoteTicker');
+            setInterval(() => {
+                ticker.style.opacity = '0';
+                setTimeout(() => {
+                    currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+                    ticker.innerText = quotes[currentQuoteIndex];
+                    ticker.style.opacity = '1';
+                }, 400);
+            }, 5000);
+        }
+
+        // Particle Cyber Canvas
+        function initCyberCanvas() {
+            const canvas = document.getElementById('cyberCanvas');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const particles = Array.from({ length: 45 }, () => ({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                size: Math.random() * 2 + 1
+            }));
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                for (let i = 0; i < particles.length; i++) {
+                    let p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                    ctx.fillStyle = '#00f0ff';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        let p2 = particles[j];
+                        let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                        if (dist < 130) {
+                            ctx.strokeStyle = `rgba(0, 240, 255, ${0.15 - dist / 130 * 0.15})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // Intersection Observer Scroll Animations
+        function setupScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.reveal-fade-up, .reveal-slide-left, .reveal-scale-up');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal-active');
+                    }
+                });
+            }, {
+                threshold: 0.08,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            animatedElements.forEach(el => observer.observe(el));
+        }
+
+        window.onload = function() {
+            renderOfficers();
+            renderRoster();
+            renderAlbums();
+            renderNotes();
+            renderFreedomPosts();
+            startQuoteTicker();
+            initCyberCanvas();
+            setupScrollAnimations();
+        };
+    </script>
+</body>
+</html>
